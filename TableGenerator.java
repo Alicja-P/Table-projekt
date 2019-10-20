@@ -1,8 +1,8 @@
 package table_try;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Font;
+import java.awt.Graphics2D;
 
 public class TableGenerator {
 	
@@ -25,6 +25,15 @@ public class TableGenerator {
 		
 		for(int i=0; i<map.length; i++) {
 			for(int j=0; j<map[0].length; j++) {
+				//jeśli kafelek ma wartość 1 ma kolor biały, jeśli 0 - kolor niebieski
+				if(map[i][j]==1) {
+					g.setColor(Color.white);
+				}
+				else
+				{
+					g.setColor(Color.blue);
+				}
+				
 				g.fillRect(j * width + 80, i * height + 50, width-4, height-4);
 				
 				int d=0;
@@ -39,8 +48,4 @@ public class TableGenerator {
 		}
 	}
 	
-	public void setBrickValue(int value, int row, int col) {
-		map[row][col] = value;
-	}
-
 }
