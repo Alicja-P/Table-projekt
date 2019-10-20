@@ -2,6 +2,7 @@ package table_try;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Font;
 
 public class TableGenerator {
 	
@@ -19,13 +20,21 @@ public class TableGenerator {
 	}
 	
 	public void draw(Graphics2D g) {
+		g.setFont(new Font("serif", Font.BOLD, 30));
+		g.setColor(Color.white);
 		
 		for(int i=0; i<map.length; i++) {
-			
 			for(int j=0; j<map[0].length; j++) {
-					g.setColor(Color.white);
-				
 				g.fillRect(j * width + 80, i * height + 50, width-4, height-4);
+				
+				int d=0;
+				for(int z=0; z<map[0].length; z++)
+				{	
+					g.drawString("  "+(z+1), 105+d, 40);
+					d = d+100;
+				}
+			
+				g.drawString((i+1)+"  ", 45, i * height + 85);
 			}
 		}
 	}
