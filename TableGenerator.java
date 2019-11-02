@@ -21,12 +21,10 @@ public class TableGenerator {
 	
 	public void draw(Graphics2D g) {
 		g.setFont(new Font("serif", Font.BOLD, 30));
-		g.setColor(Color.white);
 		
 		for(int i=0; i<map.length; i++) {
 			for(int j=0; j<map[0].length; j++) {
-				//jeśli kafelek ma wartość 1 ma kolor biały, jeśli 0 - kolor niebieski
-				if(map[i][j]==1) {
+				if(map[i][j]>0) {
 					g.setColor(Color.white);
 				}
 				else
@@ -37,13 +35,25 @@ public class TableGenerator {
 				g.fillRect(j * width + 80, i * height + 50, width-4, height-4);
 				
 				int d=0;
+				
 				for(int z=0; z<map[0].length; z++)
 				{	
-					g.drawString("  "+(z+1), 105+d, 40);
+					if(map[0][z]==0)
+						{g.setColor(Color.blue);
+						g.drawString("  "+(z+1), 105+d, 40);}
+					else
+						{g.setColor(Color.white);
+						g.drawString("  "+(z+1), 105+d, 40);}
 					d = d+100;
 				}
 			
-				g.drawString((i+1)+"  ", 45, i * height + 85);
+				
+					if(map[i][0]==0)
+						{g.setColor(Color.blue);
+						g.drawString((i+1)+"  ", 45, i * height + 85);}
+					else
+						{g.setColor(Color.white);
+						g.drawString((i+1)+"  ", 45, i * height + 85);}
 			}
 		}
 	}
