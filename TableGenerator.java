@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 public class TableGenerator {
 	
 	public int map[][];
-	public int width = 100;
+	public int width = 60;
 	public int height = 60;
 
 	public TableGenerator(int row, int col) {
@@ -40,11 +40,11 @@ public class TableGenerator {
 				{	
 					if(map[0][z]==0)
 						{g.setColor(Color.blue);
-						g.drawString("  "+(z+1), 105+d, 40);}
+						g.drawString("  "+(z+1), 90+d, 40);}
 					else
 						{g.setColor(Color.white);
-						g.drawString("  "+(z+1), 105+d, 40);}
-					d = d+100;
+						g.drawString("  "+(z+1), 90+d, 40);}
+					d = d+59;
 				}
 			
 				
