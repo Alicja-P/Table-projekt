@@ -1,21 +1,22 @@
+package table_try;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-
-import table_try.GameMode;
-import table_try.GameMode;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,11 +26,17 @@ import java.util.concurrent.TimeUnit;
 
 public class Gameplay extends JPanel implements ActionListener, MouseMotionListener, MouseListener{
 	
+	private ImageIcon plus;
+	private ImageIcon multiply;
+	private ImageIcon logo;
+	private ImageIcon rules;
+	
 	private TableGenerator map;
 	private Menu menu;
 	private Number number;
 	public int round = 0;
 	public int picked = 0;
+	public int picked2 = 0;
 	public int score = 0;
 	public int column,row;
 	
@@ -43,6 +50,9 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 	private int delay = 8;
 	
 	public int b=0,c=0;	// zmienne do wyświetlania wyniku
+	public int add = 0;
+	public int multi = 1;
+	public int ready = 0;
 	public int game = 0;	// menu/gra/tryby
 	
 	Random rand = new Random();
@@ -68,7 +78,9 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 	
 	public void paint(Graphics g) {
 		if(game==0) {
-			menu.draw((Graphics2D)g);		//tryb menu
+			menu.paint((Graphics)g);		//tryb menu
+			logo = new ImageIcon("logo.png");
+			logo.paintIcon(this, g, 495, 70);
 		}
 		else {
 			//pisanie polecenia
@@ -78,7 +90,7 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 			g.setFont(new Font("serif", Font.BOLD, 40));
 			
 			g.drawString("Wynik: "+(score),800,260);
-			
+			g.drawString("Poziom: "+(round+1),800,360);
 			
 			
 			//opcja kolejny poziom
@@ -91,83 +103,58 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 			g.drawString("Powrót do menu", 920, 560);
 			
 			number.draw((Graphics2D)g);
-			//g.setFont(new Font("serif", Font.BOLD, 40));
-			if(picked == 1)
+			if(picked2 == 1) // dobre zaznaczenie
 			{
 				g.setColor(Color.blue);
 				g.drawString("Brawo!", 800, 150);
 			}
 			if(game==1) {
 				//pisanie wyniku
-				g.drawString(b+" * "+c+" = "+(b*c), 800, 190);
+				g.drawString(b+" * "+c+" = "+(b*c+add), 800, 190);
 				map.draw((Graphics2D)g,1);
 			}
 			if(game==2) {
 				//pisanie wyniku
+				if(multi==1) {
 				g.drawString(b+" * "+c, 800, 190);
+				if(add>0)
+				{
+					g.drawString(" + "+add, 890, 190);
+				}
+				}
+				if(multi>1)
+				{
+					if(add>0)
+					g.drawString("( "+b+" * "+c+" + "+add+" ) * "+multi, 800, 190);
+					else
+					g.drawString("( "+b+" * "+c+" ) * "+multi, 800, 190);
+				}
 				map.draw((Graphics2D)g,0);
+				plus = new ImageIcon("plus2.png");
+				multiply = new ImageIcon("razy2.png");
+				plus.paintIcon(this, g, 80, 530);
+				multiply.paintIcon(this, g, 210, 530);
+				g.setColor(Color.gray);
+				g.fillRect(80,650, 105, 40);
+				g.fillRect(210,650, 106, 40);
+				g.fillRect(350,650, 150, 40);
+				g.setColor(Color.black);
+				g.drawString("Cofnij", 80, 680);
+				g.drawString("Cofnij", 210, 680);
+				g.drawString("Sprawdź", 350, 680);
 			}
-		}
-		/*
-		if(game==1) {
-			//pisanie polecenia
-			g.setColor(Color.black);
-			g.fillRect(0, 0, 1280, 1024);
-			g.setColor(Color.white);
-			g.setFont(new Font("serif", Font.BOLD, 40));
-			g.drawString("Wynik: "+(score),800,260);
-			
-			if(picked == 1)
+			if(game==3)
 			{
-				g.setColor(Color.blue);
-				g.drawString("Brawo!", 800, 150);
+				rules = new ImageIcon("jak.png");
+				rules.paintIcon(this, g, 0, 0);
+				g.setColor(Color.gray);
+				g.fillRect(100,570, 210, 50);
+				g.fillRect(350,570, 200, 50);
+				g.setColor(Color.white);
+				g.drawString("Tryb nauki", 105, 605);
+				g.drawString("Tryb gry", 355, 605);
 			}
-			//pisanie wyniku
-			g.drawString(b+" * "+c+" = "+(b*c), 800, 190);
-			//opcja kolejny poziom
-			g.setColor(Color.gray);
-			g.fillRect(900, 420, 330, 60);
-			g.fillRect(900, 520, 330, 60);
-			g.setColor(Color.white);
-			g.setFont(new Font("serif", Font.BOLD, 40));
-			g.drawString("Kolejny poziom", 920, 460);
-			g.drawString("Powrót do menu", 920, 560);
-			
-			map.draw((Graphics2D)g,1);
-			number.draw((Graphics2D)g);
 		}
-		if(game==2) {
-			//pisanie polecenia
-			g.setColor(Color.black);
-			g.fillRect(0, 0, 1280, 1024);
-			g.setColor(Color.white);
-			g.setFont(new Font("serif", Font.BOLD, 40));
-			g.drawString("Wynik: "+(score),800,260);
-			
-			if(picked == 1)
-			{
-				g.setColor(Color.blue);
-				g.drawString("Brawo!", 800, 150);
-			}
-			//pisanie wyniku
-			g.drawString(b+" * "+c, 800, 190);
-			//opcja kolejny poziom
-			g.setColor(Color.gray);
-			g.fillRect(900, 420, 330, 60);
-			g.fillRect(900, 520, 330, 60);
-			g.setColor(Color.white);
-			g.setFont(new Font("serif", Font.BOLD, 40));
-			g.drawString("Kolejny poziom", 920, 460);
-			g.drawString("Powrót do menu", 920, 560);
-			
-			map.draw((Graphics2D)g,0);
-			number.draw((Graphics2D)g);
-		}
-		//else {
-			//map.draw((Graphics2D)g);
-		//}
-		 
-		 */
 		g.dispose();
 	}
 
@@ -197,7 +184,7 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 		
 		for(int i=0; i<menu.menu.length; i++)
 		{
-			if(x1>450 && x1<750 && y1>(150 +i*100) && y1<(220 + i*100))		//zaznaczanie przycisku menu gdy kursor nad nim się przesuwa
+			if(x1>450 && x1<750 && y1>(350 +i*100) && y1<(420 + i*100))		//zaznaczanie przycisku menu gdy kursor nad nim się przesuwa
 			{
 				menu.menu[i] = 1;
 			}
@@ -205,28 +192,25 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 				menu.menu[i] = 0;
 		}
 		
-		if(x2>450 && x2<750 && y2>(150) && y2<(220))		//wybranie opcji "tryb nauki" po kliknięciu myszką w przycisk menu
+		if(x2>450 && x2<750 && y2>(350) && y2<(420))		//wybranie opcji "tryb nauki" po kliknięciu myszką w przycisk menu
 		{
 			game = 1;
 			x2 = 0;
 			y2 = 0;
 		}
-		if(x2>450 && x2<750 && y2>(250) && y2<(320))		//wybranie opcji "tryb gry" po kliknięciu myszką w przycisk menu
+		if(x2>450 && x2<750 && y2>(450) && y2<(520))		//wybranie opcji "tryb gry" po kliknięciu myszką w przycisk menu
 		{
 			game = 2;
 			menu.menu[0] = 1;
 			x2 = 0;
 			y2 = 0;
 			map.blacktable();
-			/*for(int i=0;i<1;i++) {
-				column = rand.nextInt(9);
-				row = rand.nextInt(9);
-				for(int k=0;k<column;k++) {
-					for(int r=0;r<row;r++) {
-						map.map[k][r] = 1;
-					}
-				}	
-				}*/
+		}
+		if(x2>450 && x2<750 && y2>(550) && y2<(620))		//wybranie opcji "jak grać" po kliknięciu myszką w przycisk menu
+		{
+			game = 3;
+			x2 = 0;
+			y2 = 0;
 		}
 		
 		
@@ -238,7 +222,6 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 			while(number.number==0)
 				number.pick(round);
 			
-				
 			x2 = 0;
 			y2 = 0;
 			
@@ -253,7 +236,10 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 			b = 0;
 			c = 0;
 			picked = 0;
+			picked2 = 0;
 			score = 0;
+			round = 0;
+			add = 0;
 			map.blanktable();
 		}
 		
@@ -266,11 +252,8 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 			y2 = 0;
 			x = 0;
 			y = 0;
-			c = 0;
-			b = 0;
 		}
 		repaint();
-		
 	}
 	
 
@@ -278,6 +261,9 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 	@Override
 	public void mouseDragged(MouseEvent m) {
 		picked = 0;
+		picked2 = 0;
+		add = 0;
+		multi = 1;
 		x=m.getX();
 		y=m.getY();
 		points.add(new Point(x,y));
@@ -295,7 +281,62 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 		x2=m.getX();
 		y2=m.getY();
 		points2.add(new Point(x2,y2));
+		if(x2>80 && x2<185 && y2>550 && y2<650)
+		{
+			++add;
+			x2 = 0;
+			y2 = 0;
+		}
+		if(x2>210 && x2<310 && y2>550 && y2<650)
+		{
+			multi = multi * 2;
+			x2 = 0;
+			y2 = 0;
+		}
+		if(x2>80 && x2<185 && y2>650 && y2<690)
+		{
+			--add;
+			x2 = 0;
+			y2 = 0;
+		}
+		if(x2>210 && x2<316 && y2>650 && y2<690)
+		{
+			multi = multi/2;
+			x2 = 0;
+			y2 = 0;
+		}
+		if(x2>350 && x2<500 && y2>650 && y2<690)
+		{
+			ready = 1;
+			x2 = 0;
+			y2 = 0;
+		}
+		if((add+(b*c))*multi == number.number && ready==1)
+		{
+			score+=1;
+			if(score%6 == 0 && round<7)
+				round+=1;
+			number.pick(round);
+			while(number.number==0)
+				number.pick(round);
+			picked = 1;
+			picked2 = 1;
+			ready = 0;
+		}
 		
+		if(game==3 && x2>100 && x2<310 && y2>570 && y2<630)
+		{
+			game = 1;
+			x2 = 0;
+			y2 = 0;
+		}
+		if(game==3 && x2>350 && x2<550 && y2>570 && y2<630)
+		{
+			game = 2;
+			x2 = 0;
+			y2 = 0;
+			map.blacktable();
+		}
 	}
 
 	@Override
@@ -318,16 +359,15 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(b*c == number.number)
+		if(((b*c)) == number.number)
 		{
 			score+=1;
 			if(score%6 == 0 && round<7)
 				round+=1;
 			number.pick(round);
-			while(number.number==0)
-				number.pick(round);
 			picked = 1;
-			
+			picked2 = 1;
+			add = 0;
 		}
 		
 	}
