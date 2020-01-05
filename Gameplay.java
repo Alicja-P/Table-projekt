@@ -18,7 +18,6 @@ import javax.swing.Timer;
 import java.util.ArrayList;
 import java.util.Random;
 
-
 public class Gameplay extends JPanel implements ActionListener, MouseMotionListener, MouseListener{
 	
 	private ImageIcon plus;
@@ -27,40 +26,40 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 	private ImageIcon multiply_five;
 	private ImageIcon logo;
 	private ImageIcon rules;
+	public static final Color MEDIUM_blue = new Color(0,162,232);
 	
 	private TableGenerator map;
 	private Menu menu;
 	Number number;
 	public int round = 0;
-	public int picked = 0;
-	public int picked2 = 0;
+	public int picked = 0;		//dobre zaznaczenie liczby picked=1
+	public int picked2 = 0;		//zmienna potrzebna w trybie gry do jednorazowej zmiany pola po zaznaczeniu i utrzymaniu napisu "Brawo!"
 	public int score = 0;
 	public int column,row;
 	public int check = 0;
 	
-	
-	private int x, y, x1, y1, x2, y2;						// współrzędne kursora przy przeciąganiu po kafelkach, przesuwaniu w menu i klikaniu w menu
+	private int x, y, x1, y1, x2, y2;						// współrzędne kursora przy przeciąganiu, przesuwaniu i klikaniu
 	ArrayList<Point> points = new ArrayList<Point>();
 	ArrayList<Point> points1 = new ArrayList<Point>();
 	ArrayList<Point> points2 = new ArrayList<Point>();
 	
 	private Timer timer;
-	public int counter = 0;
+	public int counter;
 	
 	public int b=0,c=0;	// zmienne do wyświetlania wyniku
 	public int add = 0;
 	public int multi = 1;
 	public int ready = 0;
-	public int game = 0;	// menu/gra/tryby
+	public int game = 0;	// menu(0)/tryb nauki(1)/tryb gry(2)/jak grać(3)/przegrana(4)
 	
 	Random rand = new Random();
 	
 	public Gameplay() {
-		//this.setLayout(null);
 		map = new TableGenerator(10);
 		menu = new Menu();
 		number = new Number(7);
 		number.pick(round);	//Wybieranie liczby do zaznaczenia
+		check = number.number;
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		setFocusable(true);
@@ -71,52 +70,70 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 	}
 	
 	public void paint(Graphics g) {
-		if(game==0) {
-			menu.paint((Graphics)g);		//tryb menu
+		g.setFont(new Font("serif", Font.BOLD, 40));
+		switch(game) {
+		case 0: 
+			menu.paint((Graphics)g);		
 			logo = new ImageIcon("logo.png");
 			logo.paintIcon(this, g, 495, 70);
-		}
-		else {
-			//pisanie polecenia
+			break;
+		case 3:
+			rules = new ImageIcon("jak.png");
+			rules.paintIcon(this, g, 0, 0);
+			g.setColor(Color.gray);
+			g.fillRect(100,570, 210, 50);
+			g.fillRect(350,570, 200, 50);
+			g.setColor(Color.white);
+			g.drawString("Tryb nauki", 105, 605);
+			g.drawString("Tryb gry", 355, 605);
+			break;
+		case 4:
+			g.setColor(Color.black);
+			g.fillRect(0, 0, 1280, 730);
+			g.setColor(Color.gray);
+			g.fillRect(200, 350, 125, 50);
+			g.fillRect(340, 350, 300, 50);
+			g.setColor(Color.white);
+			g.drawString("Koniec gry",200,260);
+			g.drawString("Chcesz grać dalej?",200,300);
+			g.drawString("Gram",210,388);
+			g.drawString("Powrót do menu",350,388);
+			break;
+		default: 
 			g.setColor(Color.black);
 			g.fillRect(0, 0, 1280, 730);
 			g.setColor(Color.white);
-			g.setFont(new Font("serif", Font.BOLD, 40));
-			
 			g.drawString("Wynik: "+(score),800,260);
-			g.drawString("Poziom: "+(round+1),800,360);
-			
-			
-			//opcja kolejny poziom
+			g.drawString("Poziom: "+(round+1)+"/9",800,360);
 			g.setColor(Color.gray);
+			if(game==1)
 			g.fillRect(900, 420, 330, 60);
 			g.fillRect(900, 520, 330, 60);
 			g.setColor(Color.white);
-			g.setFont(new Font("serif", Font.BOLD, 40));
+			if(game==1)
 			g.drawString("Kolejny poziom", 920, 460);
 			g.drawString("Powrót do menu", 920, 560);
 			
 			number.draw((Graphics2D)g);
+			
 			if(picked2 == 1) // dobre zaznaczenie
 			{
-				g.setColor(Color.blue);
+				g.setColor(MEDIUM_blue);
 				g.drawString("Brawo!", 800, 150);
 			}
 			if(game==1) {
-				//pisanie wyniku
-				g.drawString(b+" * "+c+" = "+(b*c+add), 800, 190);
+				g.drawString(b+" * "+c+" = "+(b*c), 800, 190);	//pisanie wyniku w trybie nauki
 				map.draw((Graphics2D)g,1);
 			}
 			if(game==2) {
-				//pisanie wyniku
 				if(multi==1) {
-				g.drawString(b+" * "+c, 800, 190);
-				if(add>0)
-				{
-					g.drawString(" + "+add, 890, 190);
+					g.drawString(b+" * "+c, 800, 190);		//pisanie wyniku w trybie gry
+					if(add>0)
+					{
+						g.drawString(" + "+add, 890, 190);
+					}
 				}
-				}
-				if(multi>1)
+				else
 				{
 					if(add>0)
 					g.drawString("( "+b+" * "+c+" + "+add+" ) * "+multi, 800, 190);
@@ -148,34 +165,6 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 				g.setColor(Color.white);
 				g.drawString("Czas: "+counter/60, 800, 40);
 			}	
-				
-				if(game == 4) 
-				{
-					g.setColor(Color.black);
-					g.fillRect(0, 0, 1280, 730);
-					g.setColor(Color.gray);
-					g.fillRect(200, 350, 125, 50);
-					g.fillRect(340, 350, 300, 50);
-					g.setColor(Color.white);
-					g.setFont(new Font("serif", Font.BOLD, 40));
-					g.drawString("Koniec gry",200,260);
-					g.drawString("Chcesz grać dalej?",200,300);
-					g.setFont(new Font("serif", Font.BOLD, 40));
-					g.drawString("Gram",210,388);
-					g.drawString("Powrót do menu",350,388);
-				}
-			
-			if(game==3)
-			{
-				rules = new ImageIcon("jak.png");
-				rules.paintIcon(this, g, 0, 0);
-				g.setColor(Color.gray);
-				g.fillRect(100,570, 210, 50);
-				g.fillRect(350,570, 200, 50);
-				g.setColor(Color.white);
-				g.drawString("Tryb nauki", 105, 605);
-				g.drawString("Tryb gry", 355, 605);
-			}
 		}
 		g.dispose();
 	}
@@ -185,29 +174,20 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 		
 		if(game==2)
 		{
-			counter++;
-			if(round<4 && counter>660) {
+			counter--;
+			if(counter==0) 		//upłynięcie czasu w trybie gry
+			{
 				number.pick(round);
+				check = number.number;
 				map.blacktable();
-				counter = 0;
-				x = 0;
-				y = 0;
-				b = 0;
-				c = 0;
-				add = 0;
-				multi = 0;
-				score--;}
-			if(round>3 && counter>1080) {
-				number.pick(round);
-				map.blacktable();
-				counter = 0;
-				x = 0;
-				y = 0;
-				b = 0;
-				c = 0;
-				add = 0;
-				multi = 0;
-				score--;}
+				counter = 660;
+				reset();
+				score--;
+				if(round<4)
+					counter = 660;
+				else
+					counter = 1080;
+			}
 		}
 	
 		for(int i = 0; i<map.map.length; i++) {
@@ -253,61 +233,8 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 				menu.menu[i] = 0;
 		}
 		
-		if(x2>450 && x2<750 && y2>(350) && y2<(420))		//wybranie opcji "tryb nauki" po kliknięciu myszką w przycisk menu
-		{
-			game = 1;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>450 && x2<750 && y2>(450) && y2<(520))		//wybranie opcji "tryb gry" po kliknięciu myszką w przycisk menu
-		{
-			game = 2;
-			menu.menu[0] = 1;
-			x2 = 0;
-			y2 = 0;
-			map.blacktable();
-		}
-		if(x2>450 && x2<750 && y2>(550) && y2<(620))		//wybranie opcji "jak grać" po kliknięciu myszką w przycisk menu
-		{
-			game = 3;
-			x2 = 0;
-			y2 = 0;
-		}
-		
-		
-		if(x2>900 && x2<1200 && y2>420 && y2<480 )		//wybranie opcji "kolejny poziom"
-		{
-			if(round<7)
-				round+=1;
-			number.pick(round);
-			while(number.number==0)
-				number.pick(round);
-			
-			x2 = 0;
-			y2 = 0;
-			
-		}
-		if(x2>900 && x2<1200 && y2>520 && y2<580)		//wybranie opcji "powrót do menu"
-		{
-			game = 0;
-			x2 = 0;
-			y2 = 0;
-			x = 0;
-			y = 0;
-			b = 0;
-			c = 0;
-			picked = 0;
-			picked2 = 0;
-			score = 0;
-			round = 0;
-			add = 0;
-			map.blanktable();
-		}
-		
 		if(game==2 && picked==1) {
-			for(int i=0;i<1;i++)
-			{
-			map.blacktable();}
+			map.blacktable();
 			picked=0;
 			x2 = 0;
 			y2 = 0;
@@ -344,120 +271,151 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 		x2=m.getX();
 		y2=m.getY();
 		points2.add(new Point(x2,y2));
-		if(x2>80 && x2<185 && y2>550 && y2<650)
+		
+		if(game==1 && x2>900 && x2<1200 && y2>420 && y2<480 )		//wybranie opcji "kolejny poziom"
 		{
-			++add;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>210 && x2<310 && y2>550 && y2<650)
-		{
-			multi = multi * 2;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>340 && x2<440 && y2>550 && y2<650)
-		{
-			multi = multi * 3;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>470 && x2<570 && y2>550 && y2<650)
-		{
-			multi = multi * 5;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>80 && x2<185 && y2>650 && y2<690)
-		{
-			--add;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>210 && x2<316 && y2>650 && y2<690)
-		{
-			multi = multi/2;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>340 && x2<440 && y2>650 && y2<690)
-		{
-			multi = multi/3;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>470 && x2<570 && y2>650 && y2<690)
-		{
-			multi = multi/5;
-			x2 = 0;
-			y2 = 0;
-		}
-		if(x2>600 && x2<750 && y2>650 && y2<690)
-		{
-			ready = 1;
-			x2 = 0;
-			y2 = 0;
-		}
-		if((add+(b*c))*multi == number.number && ready==1)
-		{
-			score+=1;
-			if(score%6 == 0 && round<7)
+			if(round<8) {
 				round+=1;
 			number.pick(round);
-			while(number.number==check)
+			while(number.number==check)	//sprawdzanie by losowane liczby się nie powtarzały
 				number.pick(round);
 			check = number.number;
-			picked = 1;
-			picked2 = 1;
-			ready = 0;
-			counter = 0;
+			}
 		}
-		
+		if(x2>900 && x2<1200 && y2>520 && y2<580)		//wybranie opcji "powrót do menu"
+		{
+			game = 0;
+			reset();
+			score = 0;
+			round = 0;
+			map.blanktable();
+		}
+		if(game==0)
+		{
+			if(x2>450 && x2<750 && y2>(350) && y2<(420))		//wybranie opcji "tryb nauki" po kliknięciu myszką w przycisk menu
+			{
+				game = 1;
+			}
+			if(x2>450 && x2<750 && y2>(450) && y2<(520))		//wybranie opcji "tryb gry" po kliknięciu myszką w przycisk menu
+			{
+				game = 2;
+				menu.menu[0] = 1;
+				map.blacktable();
+				counter = 660;
+				number.pick(round);
+				check = number.number;
+			}
+			if(x2>450 && x2<750 && y2>(550) && y2<(620))		//wybranie opcji "jak grać" po kliknięciu myszką w przycisk menu
+			{
+				game = 3;
+			}
+		}
+		if(game==2)
+		{
+			if(x2>80 && x2<185 && y2>550 && y2<650)		//kliknięcie w przycisk "+1"
+			{
+				++add;
+			}
+			if(x2>210 && x2<310 && y2>550 && y2<650)	//kliknięcie w przycisk "x2"
+			{
+				multi = multi * 2;
+			}
+			if(x2>340 && x2<440 && y2>550 && y2<650)	//kliknięcie w przycisk "x3"
+			{
+				multi = multi * 3;
+			}
+			if(x2>470 && x2<570 && y2>550 && y2<650)	//kliknięcie w przycisk "x5"
+			{
+				multi = multi * 5;
+			}
+			if(x2>80 && x2<185 && y2>650 && y2<690)		//kliknięcie w przyciski "cofnij"
+			{
+				--add;
+			}
+			if(x2>210 && x2<316 && y2>650 && y2<690)
+			{
+				multi = multi/2;
+			}
+			if(x2>340 && x2<440 && y2>650 && y2<690)
+			{
+				multi = multi/3;
+			}
+			if(x2>470 && x2<570 && y2>650 && y2<690)
+			{
+				multi = multi/5;
+			}
+			if(x2>600 && x2<750 && y2>650 && y2<690)	// kliknięcie w przycisk "sprawdz"
+			{
+				ready = 1;
+				if((add+(b*c))*multi != number.number)
+				{
+					score--;
+					ready = 0;
+				}
+			}
+			if((add+(b*c))*multi == number.number && ready==1)	//w trybie gry liczba jest zaznaczona dobrze i kliknięty jest przycisk "sprawdz"
+			{
+				score+=1;
+				if(score%6 == 0 && round<7)
+					round+=1;
+				number.pick(round);
+				while(number.number==check)	//sprawdzanie by losowane liczby się nie powtarzały
+					number.pick(round);
+				check = number.number;
+				picked = 1;
+				picked2 = 1;
+				ready = 0;
+				if(round<4)
+					counter = 660;
+				else
+					counter = 1080;
+			}
+		}
 		if(game==4)
 		{
-			if(x2>200 && x2<325 && y2>350 && y2<400)
+			if(x2>200 && x2<325 && y2>350 && y2<400)	//wybranie "gram" po przegranej
 			{
 				game=2;
+				reset();
 				score=0;
-				counter=0;
-			}
-			if(x2>340 && x2<640 && y2>350 && y2<400)
-			{
-				game = 0;
-				counter = 0;
-				x2 = 0;
-				y2 = 0;
-				x = 0;
-				y = 0;
-				b = 0;
-				c = 0;
 				picked = 0;
 				picked2 = 0;
-				score = 0;
 				round = 0;
 				add = 0;
+				multi = 1;
+				counter=660;
+			}
+			if(x2>340 && x2<640 && y2>350 && y2<400)	//wybranie "powrót do menu" po przegranej
+			{
+				game = 0;
+				reset();
+				score = 0;
+				round = 0;
+				
 				map.blanktable();
 			}
 		}
 		
-		if(game==3 && x2>100 && x2<310 && y2>570 && y2<630)
+		if(game==3 && x2>100 && x2<310 && y2>570 && y2<630)	//wybranie tryby nauki w "jak grać"
 		{
 			game = 1;
-			x2 = 0;
-			y2 = 0;
 		}
-		if(game==3 && x2>350 && x2<550 && y2>570 && y2<630)
+		if(game==3 && x2>350 && x2<550 && y2>570 && y2<620)	//wybranie tryby gry w "jak grać"
 		{
 			game = 2;
-			x2 = 0;
-			y2 = 0;
+			reset();
+			score = 0;
+			round = 0;
+			counter = 660;
 			map.blacktable();
 		}
+		x2 = 0;
+		y2 = 0;
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(((b*c)) == number.number)
+		if(((b*c)) == number.number)		//dobre zaznaczenie liczby
 		{
 			score+=1;
 			if(score%6 == 0 && round<7)
@@ -469,7 +427,10 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 			picked = 1;
 			picked2 = 1;
 			add = 0;
-			counter = 0;
+			if(round<4)
+				counter = 660;
+			else
+				counter = 1080;
 		}
 	}
 	
@@ -482,5 +443,15 @@ public class Gameplay extends JPanel implements ActionListener, MouseMotionListe
 	@Override
 	public void mousePressed(MouseEvent e) {}
 	
-	
+	public void reset()		//częste ustawianie zmiennych przy przechodzeniu do innych opcji czy przegraniu
+	{
+		x = 0;
+		y = 0;
+		b = 0;
+		c = 0;
+		add = 0;
+		multi = 1;
+		picked = 0;
+		picked2 = 0;
+	}
 }
